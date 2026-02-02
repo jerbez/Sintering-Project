@@ -24,6 +24,33 @@ def distance(x1, y1, x2, y2):
     r = ((x1 - x2)**2.0 + (y1 - y2)**2.0)**(0.5)
     return r
 
+def calcCOM(OUTPUT_data,i,j):
+    xi = OUTPUT_data[i][2]
+    yi = OUTPUT_data[i][3]
+    mi = OUTPUT_data[i][0]
+    xj = OUTPUT_data[j][2]
+    yj = OUTPUT_data[j][3]
+    mj = OUTPUT_data[j][0]
+
+    Lx = param.maxx
+    Ly = param.maxy
+
+    dx = xj - xi
+    dx -= round(dx / Lx) * Lx
+    xj_img = xi + dx
+
+    xcm = (mi * xi + mj * xj_img) / (mi + mj)
+    xcm %= Lx
+
+    dy = yj - yi
+    dy -= round(dy / Ly) * Ly
+    yj_img = yi + dy
+
+    ycm = (mi * yi + mj * yj_img) / (mi + mj)
+    ycm %= Ly
+
+    return xcm, ycm
+
 # current_LCG is current largest cluster radius
 # coords is OUTPUT_DATA
 def boundaryOverlapCheck(coords, current_x, current_y, current_radius, current_LCG ):
@@ -150,9 +177,6 @@ def boundaryOverlapCheck(coords, current_x, current_y, current_radius, current_L
     # return whether overlap, position of overlap cluster
     return overlap, targetPosition, current_LCG
 
-
-
-
 def overlap_check(Clusters, OUTPUT_data, LCG):
     ovlp = False
     idx = []
@@ -168,10 +192,14 @@ def overlap_check(Clusters, OUTPUT_data, LCG):
                 d  = distance(OUTPUT_data[i][2],OUTPUT_data[i][3],OUTPUT_data[j][2],OUTPUT_data[j][3])
                 if (d < R1 + R2):
                    # print("normal overlap")
+                    #print(f'd:{d}, R1:{R1}, R2:{R2}')
                     ovlp = True
                     idx.append(i)
                     idx.append(j)
                     idx_pair.append([i,j])
+                    #print(f'idx_pair:{idx_pair}')
+                    #print(f'OUTPUT_data[i]:{OUTPUT_data[i]}')
+                    #print(f'OUTPUT_data[j]:{OUTPUT_data[j]}')
                     #merge
                     numnew = OUTPUT_data[i][0] + OUTPUT_data[j][0]
                     if numnew > 8 :
@@ -181,18 +209,16 @@ def overlap_check(Clusters, OUTPUT_data, LCG):
                                 Enew = Clusters[k][4]
                                 if LCG < Rnew:
                                     LCG = Rnew
-                    if numnew <= 8 :
+                    else:
                         Rnew, Enew = boltzmannPopulationForNewCluster(numnew)
                         if LCG < Rnew:
                             LCG = Rnew
-                    if (OUTPUT_data[i][0] > OUTPUT_data[j][0]):
-                        xnew = OUTPUT_data[i][2]
-                        ynew = OUTPUT_data[i][3]
-                    else:
-                        xnew = OUTPUT_data[j][2]
-                        ynew = OUTPUT_data[j][3]
+
+                    xnew, ynew = calcCOM(OUTPUT_data,i,j)
+                    #print(f'COM:{xnew,ynew}')
                     OUTPUT_data.append([numnew,Rnew,xnew,ynew,Enew])
                     break
+
             # overlap boundary check
             ovlp1 = False
             ovlp1, overlapPosition, current_LCG = boundaryOverlapCheck(OUTPUT_data, OUTPUT_data[i][2],  OUTPUT_data[i][3], OUTPUT_data[i][1], LCG)
@@ -209,44 +235,38 @@ def overlap_check(Clusters, OUTPUT_data, LCG):
                 idx.append(i)
                 idx.append(j1)
                 idx_pair.append([i,j1])
-               # print("boundary overlap")
-               # print("LCG: " + str(LCG))
-               # print("x1: " + str(OUTPUT_data[i][2]) + " y1: " + str(OUTPUT_data[i][3])+ " r1: " + str(OUTPUT_data[i][1]) + " x2: " + str(OUTPUT_data[j1][2]) + " y2: " + str(OUTPUT_data[j1][3])+ " r2: " + str(OUTPUT_data[j1][1]))
+                #print(f'maxx:{param.maxx},maxy:{param.maxy}')
+                #print(f'idx_pair:{idx_pair}')
+                #print(f'OUTPUT_data[i]:{OUTPUT_data[i]}')
+                #print(f'OUTPUT_data[j]:{OUTPUT_data[j]}')
+                #print("boundary overlap")
+                #print("LCG: " + str(LCG))
+                #print("x1: " + str(OUTPUT_data[i][2]) + " y1: " + str(OUTPUT_data[i][3])+ " r1: " + str(OUTPUT_data[i][1]) + " x2: " + str(OUTPUT_data[j1][2]) + " y2: " + str(OUTPUT_data[j1][3])+ " r2: " + str(OUTPUT_data[j1][1]))
                 #merge
                 numnew = OUTPUT_data[i][0] + OUTPUT_data[j1][0]
-                if numnew > 8 :
+                if numnew > 8:
                     for k in range(len(Clusters)):    
                         if (Clusters[k][0] == numnew):
                             Rnew = Clusters[k][1]
                             Enew = Clusters[k][4]
                             if LCG < Rnew:
                                 LCG = Rnew
-                if numnew <= 8 :
+                else:
                     Rnew, Enew = boltzmannPopulationForNewCluster(numnew)
                     if LCG < Rnew:
-                                LCG = Rnew
-                if (OUTPUT_data[i][0] > OUTPUT_data[j1][0]):
-                    xnew = OUTPUT_data[i][2]
-                    ynew = OUTPUT_data[i][3]
-                else:
-                    xnew = OUTPUT_data[j1][2]
-                    ynew = OUTPUT_data[j1][3]
+                        LCG = Rnew
+
+                xnew, ynew = calcCOM(OUTPUT_data,i,j)
+                #print(f'COM:{xnew,ynew}')
                 OUTPUT_data.append([numnew,Rnew,xnew,ynew,Enew])
                 break
-            
-    #removing duplicates from the list
-   # idx = list(dict.fromkeys(idx))
-    #idx = list(dict.fromkeys(idx))
-    
-   # for i in sorted(idx, reverse=True):
-       # del (OUTPUT_data[i])
 
     # new remove methond
     if (ovlp == True):
         if (idx[0]<idx[1]):
             OUTPUT_data.pop(idx[0]) # remove i 
             OUTPUT_data.pop(idx[1]-1) # remove j -1
-        if (idx[0]>idx[1]):
+        elif (idx[0]>idx[1]):
             OUTPUT_data.pop(idx[0]) # remove i 
             OUTPUT_data.pop(idx[1]) # remove j  
     return OUTPUT_data, ovlp, idx_pair, LCG
@@ -473,8 +493,6 @@ PES_copy     = copy.deepcopy(PES)
 
 with open('LOG', 'w') as f5:
     f5.write('%s\n' % ('**********LOG info**********'))
-
-    
     
 LCG = 0
 for cluster in OUTPUT_data:
@@ -493,7 +511,7 @@ with open('metropolis','w') as f4:
         overlap = False
         indexListAll = []
         overlapCheck = True # overlapCheck is to check whether not there is more overlap. It is true as long as ovlp is true. It is false once ovlp is false.
-        while (overlapCheck and (overlapNumberCount < param. LimitForOverlap)):
+        while (overlapCheck and (overlapNumberCount < param.LimitForOverlap)):
             
             OUTPUT_data, ovlp, index_list, LCG = overlap_check(Clusters, OUTPUT_data, LCG)
             totalAtoms1 = 0
@@ -505,7 +523,14 @@ with open('metropolis','w') as f4:
             overlapCheck = ovlp            
             Ncluster = len(OUTPUT_data)
             if (ovlp == True and step == 0):
-                raise ValueError('Overlapping clusters found in the initial setup!')
+                with open('LOG', 'a') as f5:
+                    f5.write('%5s  %12i\n' % ('step =',step))
+                    f5.write('%27s \n' %  ('**********OVERLAP**********'))
+                    f5.write('%27s \n' %  ('Overlapping clusters found!'))
+                    for lst in indexListAll:
+                        f5.write('%s' % (lst))
+                    f5.write('\n')
+                #raise ValueError('Overlapping clusters found in the initial setup!')
             elif (ovlp == False and step == 0):
                 print('No overlapping clusters found in the initial setp!')
                 break
@@ -648,27 +673,51 @@ with open('LOG', 'a') as f5:
     f5.write('%5s \n' %  ('DONE!'))
     f5.write('%s \n' %  ('***************************************'))
 
-if param.SinteringResultPlot: 
+if param.SinteringResultPlot:
         # plot setting
 
-    minorLocator = AutoMinorLocator()
-    mlx  = MultipleLocator(param.xstep_max)
-    mly  = MultipleLocator(param.ystep_max)
+    fig,axs = plt.subplots(1,2,sharey=False) # Defines ax variable by creating an empty plot
 
-    title_font = {'fontname':'Times New Roman', 'size':'18', 'color':'black', 'weight':'normal',
-                  'verticalalignment':'bottom'} # Bottom vertical alignment for more space
-    axis_font = {'fontname':'Times New Roman', 'size':'18'}
-    mpl.rc('font',family='Times New Roman')
+# Configure Both Subplots
+    axs[0].grid(which='both', axis='both', linestyle='--')
+    axs[1].grid(which='both', axis='both', linestyle='--')
+    axs[0].set_axisbelow(True)
+    axs[1].set_axisbelow(True)
 
-    ax = plt.subplot() # Defines ax variable by creating an empty plot
+    axs[1].tick_params(axis='both', labelsize=14)
+    axs[1].xaxis.set_major_locator(MultipleLocator(10))
+    axs[1].xaxis.set_minor_locator(MultipleLocator(2))
+    axs[1].yaxis.set_major_locator(MultipleLocator(10))
+    axs[1].yaxis.set_minor_locator(MultipleLocator(2))
+    axs[1].set_ylim(0,param.maxy)
+    axs[1].set_xlim(0,param.maxx)
+    axs[1].set_title('Final Distribution')
 
-    # Set the tick labels font
-    for label in (ax.get_yticklabels() + ax.get_xticklabels()):
-        label.set_fontname('Times New Roman')
-        label.set_fontsize(16)
+    axs[0].tick_params(axis='both', labelsize=14)
+    axs[0].xaxis.set_major_locator(MultipleLocator(10))
+    axs[0].xaxis.set_minor_locator(MultipleLocator(2))
+    axs[0].yaxis.set_major_locator(MultipleLocator(10))
+    axs[0].yaxis.set_minor_locator(MultipleLocator(2))
+    axs[0].set_ylim(0,param.maxy)
+    axs[0].set_xlim(0,param.maxx)
+    axs[0].set_title('Initial Distribution')
 
-    ax.yaxis.set_minor_locator(mly)
-    ax.xaxis.set_minor_locator(mlx)
+    xcoords = []
+    ycoords = []
+    Rcoords = []
+    types   = []
+    for i in range(len(INIT_data)):
+        xcoords.append(INIT_data[i][2])
+        ycoords.append(INIT_data[i][3])
+        Rcoords.append(30*int(INIT_data[i][1])**2)
+        types.append(int(INIT_data[i][0]))
+
+    for i,type in enumerate(types):
+        x = xcoords[i]
+        y = ycoords[i]
+        axs[0].scatter(xcoords, ycoords, color='blue', s=Rcoords, marker='o')
+        axs[0].text(x, y, type, fontsize=(12+type/3), color='yellow', horizontalalignment='center',
+                 verticalalignment='center')
 
     xcoords = []
     ycoords = []
@@ -680,20 +729,12 @@ if param.SinteringResultPlot:
         Rcoords.append(30*int(OUTPUT_data[i][1])**2)
         types.append(int(OUTPUT_data[i][0]))
 
-    frame1 = plt.gca()
-    frame1.axes.yaxis.set_ticklabels([])
-    plt.yticks([])
-    frame1.axes.xaxis.set_ticklabels([])
-    plt.xticks([])
-    plt.ylim(0,(ydups+1)*param.primcell_b)
-    plt.xlim(0,(xdups+1)*param.primcell_a)
     for i,type in enumerate(types):
         x = xcoords[i]
         y = ycoords[i]
-        plt.scatter(xcoords, ycoords, color='blue', s=Rcoords, marker='o')
-        plt.text(x, y, type, fontsize=(12+type/3), color='yellow', horizontalalignment='center', 
+        axs[1].scatter(xcoords, ycoords, color='blue', s=Rcoords, marker='o')
+        axs[1].text(x, y, type, fontsize=(12+type/3), color='yellow', horizontalalignment='center',
                  verticalalignment='center')
-    #plt.axvline(x=(xdups+1)*param.primcell_a, color='black', linestyle='-')
-    #plt.axhline(y=(ydups+1)*param.primcell_b, color='black', linestyle='-')
-    #plt.grid(which='minor', axis='both', linestyle='--')
+
     plt.show()
+

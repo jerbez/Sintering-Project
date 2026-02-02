@@ -6,8 +6,8 @@ num_single_atom = 0  # num of single atom Pt
 largest_cluster = 2  # largest initial cluster size in the system 
 
 # total number of steps, write step, and temperature
-MMAX   = 10000
-wstep  =  1 
+MMAX   = 10
+wstep  = 1 
 T      = 700
 
 # unit cell parameters in A
