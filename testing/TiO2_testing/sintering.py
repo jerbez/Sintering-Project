@@ -294,56 +294,49 @@ def PES_finder(X_new, Y_new, PES_copy, N_mesh):
         raise ValueError('Could not find PES for single atom. Bad move! Check you initial setup')      
     return E_PES
 
+# Function that searches for cluster energies and radii from the DATA file. The inputs are the index of a specific cluster and
+# whether a monomer is to be added or removed from that cluster.
 def Cluster_finder(Clusters, OUTPUT_data, irmv, iadd, which='both'):
-    prob1     = []
-    prob2     = []
-    prob1_tmp = []
-    prob2_tmp = []
+    P_add = []
+    P_rmv = []
+    E_add = []
+    E_rmv = []
+    R_add = []
+    R_rmv = []
+
+    # Find data of the new cluster size for either the 'add' or the 'remove' case. For sizes 1-8, include ensemble probabilities.
     for j in range(Ncluster_tot):     
         if (Clusters[j][0] == OUTPUT_data[iadd][0] + 1 and (which == 'add' or which == 'both') ) :
-            if (prob1_tmp == []):
-                E_min_add = Clusters[j][4]
-                prob1_tmp.append(1.0)     
-            else:
-                # choose a larger cluster
-                prob1_tmp.append( expit(-beta * (Clusters[j][4] - E_min_add) ))     
+            E_add.append(Clusters[j][4])
+            R_add.append(Clusters[j][1])
+            P_add.append(expit(-beta*(Clusters[j][4])))
+        
         if (Clusters[j][0] == OUTPUT_data[irmv][0] - 1 and (which == 'remove' or which == 'both') ) :
-            if (prob2_tmp == []):
-                E_min_rmv = Clusters[j][4]
-                prob2_tmp.append(1.0)     
-            else:
-                # choose a smaller cluster
-                prob2_tmp.append( expit(-beta * (Clusters[j][4] - E_min_rmv) ))    
+            E_rmv.append(Clusters[j][4])
+            R_rmv.append(Clusters[j][1])
+            P_rmv.append(expit(-beta*(Clusters[j][4])))
 
+    # Select a cluster isomer to add based on the boltzman probability and back calculate the energy from the probability
     if ( which == 'add' or which == 'both' ): 
-        prob1 = [icount / sum(prob1_tmp) for icount in prob1_tmp]
-        # weighted random chosen number
-        clust_idx_add = np.random.choice(np.arange(len(prob1)), 1, p=prob1, replace=False)     
-        Enew_ad   = - np.log(prob1_tmp[clust_idx_add[0]]) / beta + E_min_add
+        P_add_norm = [icount / sum(P_add) for icount in P_add]
+        clust_idx_add = np.random.choice(np.arange(len(P_add_norm)), 1, p=P_add_norm, replace=False)[0] 
+        Enew_add = E_add[cluster_dix_add]
+        Rnew_add = R_add[cluster_dix_add]
 
+    # Select a cluster isomer to remove based on the boltzman probability and back calculate the energy from the probability
     if ( which == 'remove' or which == 'both' ): 
-        prob2 = [icount / sum(prob2_tmp) for icount in prob2_tmp]
-        # weighted random chosen number
-        clust_idx_rmv = np.random.choice(np.arange(len(prob2)), 1, p=prob2, replace=False)     
-        Enew_remv = - np.log(prob2_tmp[clust_idx_rmv[0]]) / beta + E_min_rmv
+        P_rmv_norm = [icount / sum(P_rmv) for icount in P_rmv]
+        clust_idx_rmv = np.random.choice(np.arange(len(P_rmv_norm)), 1, p=P_rmv_norm, replace=False)[0]
+        Enew_rmv = E_rmv[cluster_dix_rmv]
+        Rnew_rmv = R_rmv[cluster_dix_rmv]
 
-    remove = False
-    add    = False
-    for k in range(Ncluster_tot):          
-        if ( (Clusters[k][0] == OUTPUT_data[indx][0] - 1) and (remove==False) and (which == 'remove' or which == 'both') ):
-            Rnew_remv = Clusters[k+clust_idx_rmv[0]][1]
-            remove    = True            
-        if ( (Clusters[k][0] == OUTPUT_data[i][0] + 1) and (add==False) and (which == 'add' or which == 'both') ):
-            Rnew_ad  = Clusters[k+clust_idx_add[0]][1]
-            add      = True 
- 
-     # Return new energy and radius
+    # Return new energy and radius
     if (which == 'both'):
-        return Enew_ad, Enew_remv, Rnew_ad, Rnew_remv
+        return Enew_add, Enew_rmv, Rnew_add, Rnew_rmv
     elif (which == 'add'):
-        return Enew_ad, Rnew_ad
+        return Enew_add, Rnew_add
     elif (which == 'remove'):
-        return Enew_remv, Rnew_remv
+        return Enew_rmv, Rnew_rmv
  
 # READ INPUT   
 PES           = [] # potential energy surface element, x, y, z, E
@@ -593,7 +586,7 @@ with open('metropolis','w') as f4:
         elif ( Y_new < param.miny ): 
             Y_new = param.maxy - param.miny + Y_new
         
-        # Check for new clusters  
+        # Check if the moved monomer has landed in a existing cluster 
         inside_cluster = False
         for i in range (Ncluster):
             # if it is inside a cluster. the cluster can be just one atom
@@ -601,25 +594,28 @@ with open('metropolis','w') as f4:
             temp_r    = OUTPUT_data[i][1] + param.Ratom
             if ( (temp_dist <  temp_r) and (i != indx) ):# i != indx means that it cannot be itself.   
                 Eold = E_temp + OUTPUT_data[i][4]       # total Eold
+                
                 if ( OUTPUT_data[indx][0] == 1):# to check whether it is an atom or not
                     Enew_rmv = 0.0
                     Enew_add, Rnew_add = Cluster_finder(Clusters, OUTPUT_data, i, i, 'add')
+               
                 elif ( OUTPUT_data[indx][0] == 2):# ??? why the case of two atoms is special?
                     # CLUSTER FINDER FOR EADD
                     Enew_add, Rnew_add = Cluster_finder(Clusters, OUTPUT_data, i, i, 'add')
                     Enew_rmv = PES_finder(X_new, Y_new, PES_copy, N_mesh)
-                    Rnew_rmv = param.Ratom 
+                    Rnew_rmv = param.Ratom
                 # choose a new cluster
+
                 else:
                     Enew_add, Enew_rmv, Rnew_add, Rnew_rmv = Cluster_finder(Clusters, OUTPUT_data, indx, i, 'both')
                 Enew = Enew_add + Enew_rmv
-                
+
                 # Apply Metropolis condition here
                 cond1 = (Enew-Eold < 0.0 and E_temp != OUTPUT_data[i][4])
                 cond2 = (E_temp == OUTPUT_data[i][4] and np.exp( -beta*abs(Enew-Eold)) / (np.pi*OUTPUT_data[i][0]**2)  > np.random.rand())
                 cond3 = (E_temp != OUTPUT_data[i][4] and np.exp( -beta*(Enew-Eold) ) > np.random.rand())
                 
-                if cond1 or cond2 or cond3 
+                if cond1 or cond2 or cond3: 
                 # modify old clusters 
                     OUTPUT_data[i][0] = OUTPUT_data[i][0] + 1     # Natom
                     OUTPUT_data[i][1] = Rnew_add                     # R
