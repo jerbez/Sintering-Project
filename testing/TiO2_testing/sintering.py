@@ -337,7 +337,7 @@ def Cluster_finder(Clusters, OUTPUT_data, irmv, iadd, which='both'):
             Rnew_ad  = Clusters[k+clust_idx_add[0]][1]
             add      = True 
  
-     # return new energy and radius
+     # Return new energy and radius
     if (which == 'both'):
         return Enew_ad, Enew_remv, Rnew_ad, Rnew_remv
     elif (which == 'add'):
@@ -346,7 +346,6 @@ def Cluster_finder(Clusters, OUTPUT_data, irmv, iadd, which='both'):
         return Enew_remv, Rnew_remv
  
 # READ INPUT   
-
 PES           = [] # potential energy surface element, x, y, z, E
 INIT_data     = [] # initial cluster R, x, y, E
 Clusters      = [] # all possible cluster R and E              
@@ -452,7 +451,7 @@ Pt8_prob=[Pt8_boltz_weight[i]/Q8 for i in range(0,len(Pt8_boltz_weight))]
 Pt8_data=[ [4.6229707,0.00000000],[4.5883157 ,0.00707852],[4.6106749,0.01104738],[4.2228037,0.01222103],
           [4.4044703,0.01320434]]
 
-# for the case of pt2 to pt8
+# For the case of pt2 to pt8, assign boltzman weighted random radii and energies
 def boltzmannPopulationForNewCluster(numberOfAtoms) :
     assignedRadius = 0
     assignedEnergy = 0
@@ -494,22 +493,24 @@ def boltzmannPopulationForNewCluster(numberOfAtoms) :
 
     return assignedRadius, assignedEnergy
 
-# METROPOLIS LOOP BEGINS HERE
+# Metropolis loop begins here
 np.random.seed()  # seed for random number generator
 start_time_MC   = timeit.default_timer()
-OUTPUT_data  = copy.deepcopy(INIT_data)# ??? I change INIT_data to INIT
+OUTPUT_data  = copy.deepcopy(INIT_data)
 PES_copy     = copy.deepcopy(PES)
 
+# Create LOG file
 with open('LOG', 'w') as f5:
     f5.write('%s\n' % ('**********LOG info**********'))
     f5.write('\n')
-    
+
+# Identify largest cluster 
 LCG = 0
 for cluster in OUTPUT_data:
     if LCG <= cluster[1]:
         LCG =  cluster[1]
 
-# Write output to 'metropolis'
+# Create and begin writing output to metropolis file
 with open('metropolis','w') as f4:
     for step in range(Metro_Max+1):
         
@@ -525,7 +526,7 @@ with open('metropolis','w') as f4:
         #print(step)
         #print(str(step)+ ": " + str(totalAtoms))
         
-        #check for overlap at the beginning of each metropolis loop
+        # Combine any overlapping clusters at the beginning of each metropolis loop
         overlapNumberCount = 0
         indexListAll = []
         ovlp = True
@@ -598,7 +599,7 @@ with open('metropolis','w') as f4:
             # if it is inside a cluster. the cluster can be just one atom
             temp_dist = distance(X_new, Y_new, OUTPUT_data[i][2], OUTPUT_data[i][3])
             temp_r    = OUTPUT_data[i][1] + param.Ratom
-            if ( (temp_dist <  temp_r) and (i !=indx) ):# i != indx means that it cannot be itself.   
+            if ( (temp_dist <  temp_r) and (i != indx) ):# i != indx means that it cannot be itself.   
                 Eold = E_temp + OUTPUT_data[i][4]       # total Eold
                 if ( OUTPUT_data[indx][0] == 1):# to check whether it is an atom or not
                     Enew_rmv = 0.0
@@ -612,9 +613,13 @@ with open('metropolis','w') as f4:
                 else:
                     Enew_add, Enew_rmv, Rnew_add, Rnew_rmv = Cluster_finder(Clusters, OUTPUT_data, indx, i, 'both')
                 Enew = Enew_add + Enew_rmv
-                if ( (Enew-Eold < 0.0 and E_temp != OUTPUT_data[i][4]) or 
-                     (E_temp == OUTPUT_data[i][4] and np.exp( -beta*abs(Enew-Eold)) / (np.pi*OUTPUT_data[i][0]**2)  > np.random.rand()) or 
-                     ((E_temp != OUTPUT_data[i][4] and np.exp( -beta*(Enew-Eold) ) > np.random.rand()))  ):  # accept the move
+                
+                # Apply Metropolis condition here
+                cond1 = (Enew-Eold < 0.0 and E_temp != OUTPUT_data[i][4])
+                cond2 = (E_temp == OUTPUT_data[i][4] and np.exp( -beta*abs(Enew-Eold)) / (np.pi*OUTPUT_data[i][0]**2)  > np.random.rand())
+                cond3 = (E_temp != OUTPUT_data[i][4] and np.exp( -beta*(Enew-Eold) ) > np.random.rand())
+                
+                if cond1 or cond2 or cond3 
                 # modify old clusters 
                     OUTPUT_data[i][0] = OUTPUT_data[i][0] + 1     # Natom
                     OUTPUT_data[i][1] = Rnew_add                     # R
