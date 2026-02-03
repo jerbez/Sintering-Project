@@ -5,7 +5,6 @@ Sintering simulation via Ostwald Ripening of metalic clusters deposited on the s
 based on NVT ensemble and metropolis moves.
 
 Borna Zandkarimi 2020
-
 Revised by Jake Erbez 2026
 '''
 
@@ -631,7 +630,7 @@ with open('metropolis','w') as f4:
                     OUTPUT_data[i][4] = Enew_add
 
                     # If cluster indx (the sintering cluster) is a monomer, delete it because it was absorbed into cluster i
-                    if ( OUTPUT_data[indx][0] == 1 ):
+                    if (OUTPUT_data[indx][0] == 1):
                         del (OUTPUT_data[indx])
                         Ncluster -= 1
                     
@@ -641,51 +640,68 @@ with open('metropolis','w') as f4:
                         OUTPUT_data[indx][1] = Rnew_rmv
                         OUTPUT_data[indx][4] = Enew_rmv
 
-                    # Record the move to LOG
+                    # Record the successful transfer to LOG
                     with open('LOG', 'a') as f5:
-                        f5.write('%s \n' %  ('**********MOVE**********'))
+                        f5.write('%s \n' %  ('**********Transfer**********'))
                         f5.write('%s \n' %  (f'MONOMER TRANSFER FROM CLUSTER {indx} to {i} ACCEPTED!'))
 
+                # If transfer is unsuccessful, record to LOG
                 else:
                     with open('LOG', 'a') as f5:
-                        f5.write('%s \n' %  ('**********MOVE**********'))
+                        f5.write('%s \n' %  ('**********Transfer**********'))
                         f5.write('%s \n' %  (f'MONOMER TRANSFER FROM CLUSTER {indx} to {i} REJECTED!'))
                 inside_cluster = True
-                break  
+                break
  
-        if( inside_cluster == False ):  # we get a new single atom meaing that a new cluster forms      
-            #print('inside cluster = false')
+        # If monomer does not coincide with a cluster, create a new cluster with a single atom
+        if( inside_cluster == False ):
+            
+            # For the case of a monomer, there is no cluster left behind
             if ( OUTPUT_data[indx][0] == 1):
                 Enew_rmv = 0.0
+            
+            # For the case of a dimer, the energy and radius of the monomer left behind is computed
             elif ( OUTPUT_data[indx][0] == 2):
                 Enew_rmv = PES_finder(X_temp, Y_temp, PES_copy, N_mesh)
                 Rnew_rmv = param.Ratom
-            # choose a new cluster 
-       
+
+            # For all other cases, 
             else:
                 Enew_rmv, Rnew_rmv = Cluster_finder(Clusters, OUTPUT_data, indx, indx, 'remove')
+
+            # New energy is the monomer plus the indx cluster with one atom removed. Old energy is the energy of the indx cluster
             E_atom = PES_finder(X_new, Y_new, PES_copy, N_mesh)
-            Enew   = E_atom + Enew_rmv 
+            Enew   = E_atom + Enew_rmv
             Eold   = OUTPUT_data[indx][4]
 
-            if ( (Enew-Eold < 0.0) or ( np.exp( -beta*(Enew-Eold) ) > np.random.rand()) ):  # accept the move
+            # Apply metropolis condition here
+            if ((Enew-Eold < 0.0) or (np.exp(-beta*(Enew-Eold)) > np.random.rand())):
+                
+                # Record a successful metropolis condition
                 with open('LOG', 'a') as f5:
                     f5.write('%s \n' %  ('**********MOVE**********'))
-                    f5.write('%s \n' %  ('SINGLE ATOM MOVE OUTSIDE OF A CLUSTER ACCEPTED!'))
-                # modify old clusters  
-                if ( OUTPUT_data[indx][0] == 1 ):     # Note for a single atom move on surface
+                    f5.write('%s \n' %  (f'MONOMER MOVE OUTSIDE OF CLUSTER {indx} ACCEPTED!'))
+                
+                # For the case of the monomer, the old cluster is removed
+                if ( OUTPUT_data[indx][0] == 1 ):
                     del (OUTPUT_data[indx])
                     Ncluster -= 1
+                
+                # For all other clusters, remove an atom and update the energy and radius
                 else:
-                    OUTPUT_data[indx][0] = OUTPUT_data[indx][0] - 1     # Natom
-                    OUTPUT_data[indx][1] = Rnew_rmv                        # R
-                    OUTPUT_data[indx][4] = Enew_rmv                        # E
+                    OUTPUT_data[indx][0] = OUTPUT_data[indx][0] - 1
+                    OUTPUT_data[indx][1] = Rnew_rmv
+                    OUTPUT_data[indx][4] = Enew_rmv
+                
+                # Add the new monomer to the data
                 OUTPUT_data.append([1, param.Ratom, X_new, Y_new, E_atom])             
                 Ncluster += 1      
+            
+            # Record an unsuccessful metropolis condition
             else:
                 with open('LOG', 'a') as f5:
                     f5.write('%s \n' %  ('**********MOVE**********'))
-                    f5.write('%s \n' %  ('SINGLE ATOM MOVE OUTSIDE OF THE CLUSTER IS NOT ACCEPTED!'))
+                    f5.write('%s \n' %  (f'MONOMER MOVE OUTSIDE OF THE CLUSTER {indx} REJECTED!'))
 
         # Mark the end of the loop
         with open('LOG', 'a') as f5:
@@ -700,17 +716,19 @@ with open('LOG', 'a') as f5:
     f5.write('%5s \n' %  ('DONE!'))
     f5.write('%s \n' %  ('***************************************'))
 
+# Plot settings for before / after
 if param.SinteringResultPlot:
-        # plot setting
 
-    fig,axs = plt.subplots(1,2,sharey=False) # Defines ax variable by creating an empty plot
+    # Initialize subplots
+    fig,axs = plt.subplots(1,2,sharey=False)
 
-# Configure Both Subplots
+    # Grid settings
     axs[0].grid(which='both', axis='both', linestyle='--')
     axs[1].grid(which='both', axis='both', linestyle='--')
     axs[0].set_axisbelow(True)
     axs[1].set_axisbelow(True)
 
+    # Tick and title settings
     axs[1].tick_params(axis='both', labelsize=14)
     axs[1].xaxis.set_major_locator(MultipleLocator(10))
     axs[1].xaxis.set_minor_locator(MultipleLocator(2))
@@ -729,6 +747,7 @@ if param.SinteringResultPlot:
     axs[0].set_xlim(0,param.maxx)
     axs[0].set_title('Initial Distribution')
 
+    # Plot the clusters for the initial configuration here
     xcoords = []
     ycoords = []
     Rcoords = []
@@ -746,6 +765,7 @@ if param.SinteringResultPlot:
         axs[0].text(x, y, type, fontsize=(12+type/3), color='yellow', horizontalalignment='center',
                  verticalalignment='center')
 
+    # Plot the clusters for the final configuration here
     xcoords = []
     ycoords = []
     Rcoords = []

@@ -1,0 +1,529 @@
+**********LOG info**********
+
+Begin step 0
+------------
+**********OVERLAP********** 
+Overlapping clusters found:  [3, 20], [11, 98], [11, 83], [0, 97], [14, 16], [0, 96], [21, 55], [24, 47], [24, 73], [25, 42], [27, 54], [4, 90], [4, 89], [34, 5], [38, 39], [41, 83], [42, 78], [43, 50], [46, 81], [46, 47], [46, 82], [20, 82], [48, 50], [53, 68], [54, 57], [41, 78], [54, 6], [54, 69], [56, 26], [55, 59], [58, 59], [59, 60], [59, 71], [59, 66], [59, 60], [59, 60], [59, 66], [59, 63], [59, 61], [59, 60], [59, 60], [59, 56], [56, 61], [57, 58], [57, 58], [57, 22], [9, 58], [57, 58]
+
+**********Transfer********** 
+MONOMER TRANSFER FROM CLUSTER 28 to 54 ACCEPTED! 
+
+Begin step 1
+------------
+**********OVERLAP********** 
+Overlapping clusters found:  [24, 54], [55, 21]
+
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 48 REJECTED! 
+
+Begin step 2
+------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 33 REJECTED! 
+
+Begin step 3
+------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 53 REJECTED! 
+
+Begin step 4
+------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 37 REJECTED! 
+
+Begin step 5
+------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 16 REJECTED! 
+
+Begin step 6
+------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 47 REJECTED! 
+
+Begin step 7
+------------
+**********Transfer********** 
+MONOMER TRANSFER FROM CLUSTER 5 to 40 ACCEPTED! 
+
+Begin step 8
+------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 11 REJECTED! 
+
+Begin step 9
+------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 44 REJECTED! 
+
+Begin step 10
+-------------
+**********Transfer********** 
+MONOMER TRANSFER FROM CLUSTER 4 to 54 ACCEPTED! 
+
+Begin step 11
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 54 REJECTED! 
+
+Begin step 12
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 31 REJECTED! 
+
+Begin step 13
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 40 REJECTED! 
+
+Begin step 14
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 17 REJECTED! 
+
+Begin step 15
+-------------
+**********Transfer********** 
+MONOMER TRANSFER FROM CLUSTER 38 to 46 REJECTED! 
+
+Begin step 16
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 29 REJECTED! 
+
+Begin step 17
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 17 REJECTED! 
+
+Begin step 18
+-------------
+Begin step 19
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 16 REJECTED! 
+
+Begin step 20
+-------------
+**********Transfer********** 
+MONOMER TRANSFER FROM CLUSTER 2 to 24 ACCEPTED! 
+
+Begin step 21
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF CLUSTER 26 ACCEPTED! 
+
+Begin step 22
+-------------
+**********OVERLAP********** 
+Overlapping clusters found:  [54, 47]
+
+**********Transfer********** 
+MONOMER TRANSFER FROM CLUSTER 48 to 6 ACCEPTED! 
+
+Begin step 23
+-------------
+**********OVERLAP********** 
+Overlapping clusters found:  [6, 14]
+
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 36 REJECTED! 
+
+Begin step 24
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 48 REJECTED! 
+
+Begin step 25
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 38 REJECTED! 
+
+Begin step 26
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 6 REJECTED! 
+
+Begin step 27
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 53 REJECTED! 
+
+Begin step 28
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 26 REJECTED! 
+
+Begin step 29
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 49 REJECTED! 
+
+Begin step 30
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 47 REJECTED! 
+
+Begin step 31
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 52 REJECTED! 
+
+Begin step 32
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 25 REJECTED! 
+
+Begin step 33
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 1 REJECTED! 
+
+Begin step 34
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 41 REJECTED! 
+
+Begin step 35
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 43 REJECTED! 
+
+Begin step 36
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 20 REJECTED! 
+
+Begin step 37
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 19 REJECTED! 
+
+Begin step 38
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 1 REJECTED! 
+
+Begin step 39
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 33 REJECTED! 
+
+Begin step 40
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 12 REJECTED! 
+
+Begin step 41
+-------------
+**********Transfer********** 
+MONOMER TRANSFER FROM CLUSTER 33 to 9 ACCEPTED! 
+
+Begin step 42
+-------------
+**********OVERLAP********** 
+Overlapping clusters found:  [9, 33], [48, 52]
+
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 40 REJECTED! 
+
+Begin step 43
+-------------
+**********Transfer********** 
+MONOMER TRANSFER FROM CLUSTER 48 to 16 ACCEPTED! 
+
+Begin step 44
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 20 REJECTED! 
+
+Begin step 45
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 12 REJECTED! 
+
+Begin step 46
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 8 REJECTED! 
+
+Begin step 47
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 35 REJECTED! 
+
+Begin step 48
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 48 REJECTED! 
+
+Begin step 49
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 32 REJECTED! 
+
+Begin step 50
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 50 REJECTED! 
+
+Begin step 51
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 2 REJECTED! 
+
+Begin step 52
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 6 REJECTED! 
+
+Begin step 53
+-------------
+**********Transfer********** 
+MONOMER TRANSFER FROM CLUSTER 37 to 19 ACCEPTED! 
+
+Begin step 54
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 49 REJECTED! 
+
+Begin step 55
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 47 REJECTED! 
+
+Begin step 56
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF CLUSTER 37 ACCEPTED! 
+
+Begin step 57
+-------------
+**********Transfer********** 
+MONOMER TRANSFER FROM CLUSTER 16 to 39 REJECTED! 
+
+Begin step 58
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 37 REJECTED! 
+
+Begin step 59
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 45 REJECTED! 
+
+Begin step 60
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 50 REJECTED! 
+
+Begin step 61
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 31 REJECTED! 
+
+Begin step 62
+-------------
+**********Transfer********** 
+MONOMER TRANSFER FROM CLUSTER 0 to 29 ACCEPTED! 
+
+Begin step 63
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 30 REJECTED! 
+
+Begin step 64
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 48 REJECTED! 
+
+Begin step 65
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 0 REJECTED! 
+
+Begin step 66
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 31 REJECTED! 
+
+Begin step 67
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF CLUSTER 43 ACCEPTED! 
+
+Begin step 68
+-------------
+**********Transfer********** 
+MONOMER TRANSFER FROM CLUSTER 36 to 42 ACCEPTED! 
+
+Begin step 69
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 23 REJECTED! 
+
+Begin step 70
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 1 REJECTED! 
+
+Begin step 71
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 0 REJECTED! 
+
+Begin step 72
+-------------
+**********Transfer********** 
+MONOMER TRANSFER FROM CLUSTER 18 to 3 ACCEPTED! 
+
+Begin step 73
+-------------
+**********OVERLAP********** 
+Overlapping clusters found:  [3, 40]
+
+Begin step 74
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 24 REJECTED! 
+
+Begin step 75
+-------------
+**********Transfer********** 
+MONOMER TRANSFER FROM CLUSTER 38 to 24 REJECTED! 
+
+Begin step 76
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 10 REJECTED! 
+
+Begin step 77
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 46 REJECTED! 
+
+Begin step 78
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 0 REJECTED! 
+
+Begin step 79
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 22 REJECTED! 
+
+Begin step 80
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 17 REJECTED! 
+
+Begin step 81
+-------------
+**********Transfer********** 
+MONOMER TRANSFER FROM CLUSTER 33 to 11 ACCEPTED! 
+
+Begin step 82
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 6 REJECTED! 
+
+Begin step 83
+-------------
+**********Transfer********** 
+MONOMER TRANSFER FROM CLUSTER 38 to 24 ACCEPTED! 
+
+Begin step 84
+-------------
+**********OVERLAP********** 
+Overlapping clusters found:  [24, 38]
+
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 29 REJECTED! 
+
+Begin step 85
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 15 REJECTED! 
+
+Begin step 86
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 26 REJECTED! 
+
+Begin step 87
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 23 REJECTED! 
+
+Begin step 88
+-------------
+**********Transfer********** 
+MONOMER TRANSFER FROM CLUSTER 28 to 24 ACCEPTED! 
+
+Begin step 89
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 10 REJECTED! 
+
+Begin step 90
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 20 REJECTED! 
+
+Begin step 91
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 11 REJECTED! 
+
+Begin step 92
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 1 REJECTED! 
+
+Begin step 93
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 43 REJECTED! 
+
+Begin step 94
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 17 REJECTED! 
+
+Begin step 95
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 48 REJECTED! 
+
+Begin step 96
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 12 REJECTED! 
+
+Begin step 97
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 11 REJECTED! 
+
+Begin step 98
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 11 REJECTED! 
+
+Begin step 99
+-------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 48 REJECTED! 
+
+Begin step 100
+--------------
+**********MOVE********** 
+MONOMER MOVE OUTSIDE OF THE CLUSTER 13 REJECTED! 
+
+
+**********CALCULATION IS DONE********** 
+Total steps =           100
+    Final number of clusters =   49 
+    Total MC time in seconds =       1.62662479 
+DONE! 
+*************************************** 

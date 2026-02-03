@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import statistics as st
 
 steplines = []
-with open("metropolis1","rt") as file:
+with open("metropolis","rt") as file:
     for line in file:
         if line.startswith("s"):
             steplines.append(line.rstrip('\n'))
@@ -17,7 +17,7 @@ for i in range(0,len(steplines)):
 for i in range(0,len(splitlines)):
     clustersize1.append(int(splitlines[i][5]))
 
-
+'''
 steplines = []
 with open("metropolis2","rt") as file:
     for line in file:
@@ -160,21 +160,21 @@ for i in range(0,len(steplines)):
 
 for i in range(0,len(splitlines)):
     clustersize10.append(int(splitlines[i][5]))
-
+'''
 
 
 plt.plot(steps,clustersize1)
-plt.plot(steps,clustersize2)
-plt.plot(steps,clustersize3)#,label="isomer")#,c="g")
-plt.plot(steps,clustersize4)#,c="b",label="GM + isomer")
-plt.plot(steps,clustersize5)#,c="b")
-plt.plot(steps,clustersize6,)#c="b")
-plt.plot(steps,clustersize7)#,c="r",label="all isomer")
-plt.plot(steps,clustersize8)#,c="r")
-plt.plot(steps,clustersize9)#,c="r")
-plt.plot(steps,clustersize10)
+#plt.plot(steps,clustersize2)
+#plt.plot(steps,clustersize3)#,label="isomer")#,c="g")
+#plt.plot(steps,clustersize4)#,c="b",label="GM + isomer")
+#plt.plot(steps,clustersize5)#,c="b")
+#plt.plot(steps,clustersize6,)#c="b")
+#plt.plot(steps,clustersize7)#,c="r",label="all isomer")
+#plt.plot(steps,clustersize8)#,c="r")
+#plt.plot(steps,clustersize9)#,c="r")
+#plt.plot(steps,clustersize10)
 plt.title(input("plot title: "))
 plt.xlabel("step number")
 plt.ylabel("number of clusters")
-#plt.legend()
+plt.legend()
 plt.show()
