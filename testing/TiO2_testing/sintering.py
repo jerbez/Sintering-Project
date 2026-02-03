@@ -518,6 +518,7 @@ with open('metropolis','w') as f4:
             f5.write('%10s%0i\n' % ('Begin step ',step))
             f5.write('-' * len('Begin step ' + str(step)) + '\n')
 
+        # Count number of atoms
         totalAtoms = 0
         for tar in OUTPUT_data:
             totalAtoms = totalAtoms + tar[0]
@@ -542,16 +543,17 @@ with open('metropolis','w') as f4:
 
             overlapNumberCount += 1
 
+        # Record any overlaps to LOG
         if indexListAll != []:
             with open('LOG', 'a') as f5:
                 f5.write('%27s \n' %  ('**********OVERLAP**********'))
-                f5.write('%27s ' %  ('Overlapping clusters found! These guys right here ~> '))
+                f5.write('%27s ' %  ('Overlapping clusters found: '))
                 indices_str = ', '.join(str(lst) for lst in indexListAll)
                 f5.write(indices_str + '\n')
                 f5.write('\n')
             #raise ValueError('Overlapping clusters found in the initial setup!')
 
-        # writing output  
+        # Write current cluster configuration to metropolis
         if ( (step % write_step) == 0 ): 
             f4.write('%5s  %10i %16s %3i \n' % ('step =',step,'numclusters =',Ncluster))
             f4.write('%4s  %14s  %14s  %14s  %14s\n' %  ('Pt', 'R', 'X','Y','E'))
@@ -559,14 +561,15 @@ with open('metropolis','w') as f4:
                 f4.write('%3i  %16.8f  %16.8f  %16.8f  %16.8f\n' % (OUTPUT_data[i][0], OUTPUT_data[i][1], OUTPUT_data[i][2], OUTPUT_data[i][3], OUTPUT_data[i][4]))
             f4.write('\n')
         
-        # choosing a cluster  
+        # Choose a cluster to sinter
         indx = int(np.random.rand() * Ncluster) 
         num_atm_temp  = OUTPUT_data[indx][0] 
         R_temp        = OUTPUT_data[indx][1]
         X_temp        = OUTPUT_data[indx][2]
         Y_temp        = OUTPUT_data[indx][3]
         E_temp        = OUTPUT_data[indx][4]
-        # choosing step size  
+        
+        # Choose step size  
         if ( num_atm_temp == 1 ): #For monomer case.  
             px = int( 4.0*(2.0*np.random.rand() - 1.0) )   # -4 < px < 4   
             py = int( 4.0*(2.0*np.random.rand() - 1.0) )   # -4 < py < 4   
@@ -575,9 +578,11 @@ with open('metropolis','w') as f4:
             py = math.ceil( ( 2.0*R_temp)  * ( 2.0*np.random.rand() - 1.0 ) ) 
         X_new = X_temp + px * param.xstep_max
         Y_new = Y_temp + py * param.ystep_max
+        
         if ( X_new == X_temp and Y_new == Y_temp ):
             continue
-        # Periodic Boundry Conditions  
+        
+        # Enforce periodic Boundry Conditions  
         if ( X_new > param.maxx ):   
             X_new = param.minx - param.maxx + X_new
         elif ( X_new < param.minx ):   
@@ -586,7 +591,8 @@ with open('metropolis','w') as f4:
             Y_new = param.miny - param.maxy + Y_new
         elif ( Y_new < param.miny ): 
             Y_new = param.maxy - param.miny + Y_new
-        # check for new clusters  
+        
+        # Check for new clusters  
         inside_cluster = False
         for i in range (Ncluster):
             # if it is inside a cluster. the cluster can be just one atom
