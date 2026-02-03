@@ -5,6 +5,8 @@ Sintering simulation via Ostwald Ripening of metalic clusters deposited on the s
 based on NVT ensemble and metropolis moves.
 
 Borna Zandkarimi 2020
+
+Revised by Jake Erbez 2026
 '''
 
 import numpy as np
@@ -18,12 +20,12 @@ from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import LinearLocator
 from matplotlib.ticker import ScalarFormatter
 
-# FUNCTIONS
-
+# Define distance function 
 def distance(x1, y1, x2, y2):
     r = ((x1 - x2)**2.0 + (y1 - y2)**2.0)**(0.5)
     return r
 
+# Define function to locate center of mass between two clusters for more realistic collision
 def calcCOM(OUTPUT_data,i,j):
     xi = OUTPUT_data[i][2]
     yi = OUTPUT_data[i][3]
@@ -51,8 +53,11 @@ def calcCOM(OUTPUT_data,i,j):
 
     return xcm, ycm
 
-# current_LCG is current largest cluster radius
-# coords is OUTPUT_DATA
+# Function to check for periodic images of clusters overlapping
+# Inputs: coords: OUTPUT_DATA (data of all clusters); current_x: x position of cluster being evaluated;
+#         current_y: y position of cluster being evaluated; current_radius: radius of cluster being evaluated;
+#         current_LCG: largest cluster currently
+
 def boundaryOverlapCheck(coords, current_x, current_y, current_radius, current_LCG ):
     overlap = False
     targetPosition = -1
@@ -177,16 +182,20 @@ def boundaryOverlapCheck(coords, current_x, current_y, current_radius, current_L
     # return whether overlap, position of overlap cluster
     return overlap, targetPosition, current_LCG
 
+# Function that checks for overlapping clusters. If any are found, they are combined.
 def overlap_check(Clusters, OUTPUT_data, LCG):
     ovlp = False
     idx = []
     idx_pair = []
+
+    # Loop over all clusters and check for overlap
     for i in range(len(OUTPUT_data) - 1):
         if (ovlp == True):
             break
         else:
             for j in range(i+1, len(OUTPUT_data)):
                 
+                # Check if the distance between two clusters is less than the sum of their radii
                 R1 = OUTPUT_data[i][1] 
                 R2 = OUTPUT_data[j][1] 
                 d  = distance(OUTPUT_data[i][2],OUTPUT_data[i][3],OUTPUT_data[j][2],OUTPUT_data[j][3])
@@ -261,7 +270,7 @@ def overlap_check(Clusters, OUTPUT_data, LCG):
                 OUTPUT_data.append([numnew,Rnew,xnew,ynew,Enew])
                 break
 
-    # new remove methond
+    # Return data with the position and atomic number of the new cluster
     if (ovlp == True):
         if (idx[0]<idx[1]):
             OUTPUT_data.pop(idx[0]) # remove i 
@@ -484,8 +493,8 @@ def boltzmannPopulationForNewCluster(numberOfAtoms) :
         return assignedRadius, assignedEnergy
 
     return assignedRadius, assignedEnergy
-# METROPOLIS LOOP  
 
+# METROPOLIS LOOP BEGINS HERE
 np.random.seed()  # seed for random number generator
 start_time_MC   = timeit.default_timer()
 OUTPUT_data  = copy.deepcopy(INIT_data)# ??? I change INIT_data to INIT
@@ -493,62 +502,54 @@ PES_copy     = copy.deepcopy(PES)
 
 with open('LOG', 'w') as f5:
     f5.write('%s\n' % ('**********LOG info**********'))
+    f5.write('\n')
     
 LCG = 0
 for cluster in OUTPUT_data:
     if LCG <= cluster[1]:
         LCG =  cluster[1]
 
+# Write output to 'metropolis'
 with open('metropolis','w') as f4:
     for step in range(Metro_Max+1):
+        
+        # Mark the beginning of loop
+        with open('LOG', 'a') as f5:
+            f5.write('%10s%0i\n' % ('Begin step ',step))
+            f5.write('-' * len('Begin step ' + str(step)) + '\n')
+
         totalAtoms = 0
         for tar in OUTPUT_data:
             totalAtoms = totalAtoms + tar[0]
-       # print(str(step)+ ": " + str(totalAtoms))
-        #check overlap
+        #print(step)
+        #print(str(step)+ ": " + str(totalAtoms))
         
+        #check for overlap at the beginning of each metropolis loop
         overlapNumberCount = 0
-        overlap = False
         indexListAll = []
-        overlapCheck = True # overlapCheck is to check whether not there is more overlap. It is true as long as ovlp is true. It is false once ovlp is false.
-        while (overlapCheck and (overlapNumberCount < param.LimitForOverlap)):
+        ovlp = True
+        while (ovlp and (overlapNumberCount < param.LimitForOverlap)):
             
             OUTPUT_data, ovlp, index_list, LCG = overlap_check(Clusters, OUTPUT_data, LCG)
             totalAtoms1 = 0
             for tar in OUTPUT_data:
                 totalAtoms1 = totalAtoms1 + tar[0]
            # print(str(overlapNumberCount)+ ": " + str(totalAtoms1))
-            if (ovlp == True):
-                overlap = True
-            overlapCheck = ovlp            
             Ncluster = len(OUTPUT_data)
-            if (ovlp == True and step == 0):
-                with open('LOG', 'a') as f5:
-                    f5.write('%5s  %12i\n' % ('step =',step))
-                    f5.write('%27s \n' %  ('**********OVERLAP**********'))
-                    f5.write('%27s \n' %  ('Overlapping clusters found!'))
-                    for lst in indexListAll:
-                        f5.write('%s' % (lst))
-                    f5.write('\n')
-                #raise ValueError('Overlapping clusters found in the initial setup!')
-            elif (ovlp == False and step == 0):
-                print('No overlapping clusters found in the initial setp!')
-                break
-
-            
+           
             for index in index_list:
                 indexListAll.append(index)
 
             overlapNumberCount += 1
 
-        if (overlap == True and step > 0):
+        if indexListAll != []:
             with open('LOG', 'a') as f5:
-                f5.write('%5s  %12i\n' % ('step =',step))
                 f5.write('%27s \n' %  ('**********OVERLAP**********'))
-                f5.write('%27s \n' %  ('Overlapping clusters found!'))
-                for lst in indexListAll:
-                    f5.write('%s' % (lst))
+                f5.write('%27s ' %  ('Overlapping clusters found! These guys right here ~> '))
+                indices_str = ', '.join(str(lst) for lst in indexListAll)
+                f5.write(indices_str + '\n')
                 f5.write('\n')
+            #raise ValueError('Overlapping clusters found in the initial setup!')
 
         # writing output  
         if ( (step % write_step) == 0 ): 
@@ -557,6 +558,7 @@ with open('metropolis','w') as f4:
             for i in range(Ncluster):
                 f4.write('%3i  %16.8f  %16.8f  %16.8f  %16.8f\n' % (OUTPUT_data[i][0], OUTPUT_data[i][1], OUTPUT_data[i][2], OUTPUT_data[i][3], OUTPUT_data[i][4]))
             f4.write('\n')
+        
         # choosing a cluster  
         indx = int(np.random.rand() * Ncluster) 
         num_atm_temp  = OUTPUT_data[indx][0] 
@@ -622,7 +624,6 @@ with open('metropolis','w') as f4:
 
                 else:
                     with open('LOG', 'a') as f5:
-                        f5.write('%4s  %10i\n' % ('step=',step))
                         f5.write('%s \n' %  ('**********MOVE**********'))
                         f5.write('%s \n' %  ('METROPOLIS MOVE TO A NEW CLUSTER IS NOT FAVORABLE!'))
                 inside_cluster = True
@@ -645,7 +646,6 @@ with open('metropolis','w') as f4:
 
             if ( (Enew-Eold < 0.0) or ( np.exp( -beta*(Enew-Eold) ) > np.random.rand()) ):  # accept the move
                 with open('LOG', 'a') as f5:
-                    f5.write('%5s  %12i\n' % ('step =',step))
                     f5.write('%s \n' %  ('**********MOVE**********'))
                     f5.write('%s \n' %  ('SINGLE ATOM MOVE OUTSIDE OF A CLUSTER ACCEPTED!'))
                 # modify old clusters  
@@ -660,9 +660,12 @@ with open('metropolis','w') as f4:
                 Ncluster += 1      
             else:
                 with open('LOG', 'a') as f5:
-                    f5.write('%5s  %12i\n' % ('step =',step))
                     f5.write('%s \n' %  ('**********MOVE**********'))
                     f5.write('%s \n' %  ('SINGLE ATOM MOVE OUTSIDE OF THE CLUSTER IS NOT ACCEPTED!'))
+
+        # Mark the end of the loop
+        with open('LOG', 'a') as f5:
+            f5.write('\n')
 
 with open('LOG', 'a') as f5:
     f5.write('\n')
