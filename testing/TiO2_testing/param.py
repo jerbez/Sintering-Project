@@ -6,7 +6,7 @@ num_single_atom = 0  # num of single atom Pt
 largest_cluster = 2  # largest initial cluster size in the system 
 
 # total number of steps, write step, and temperature
-MMAX   = 1000
+MMAX   = 100
 wstep  = 1 
 T      = 700
 
@@ -42,5 +42,5 @@ Ratom  =  1.75
 
 # Control
 CounterLimit = 50000
-SinteringResultPlot = False # plot the result of sintering
+SinteringResultPlot = True # plot the result of sintering
 LimitForOverlap = 100  # limit of total number of overlap process in one step. 

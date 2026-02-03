@@ -297,6 +297,7 @@ def PES_finder(X_new, Y_new, PES_copy, N_mesh):
 # Function that searches for cluster energies and radii from the DATA file. The inputs are the index of a specific cluster and
 # whether a monomer is to be added or removed from that cluster.
 def Cluster_finder(Clusters, OUTPUT_data, irmv, iadd, which='both'):
+    cf_start = timeit.default_timer()
     P_add = []
     P_rmv = []
     E_add = []
@@ -319,16 +320,20 @@ def Cluster_finder(Clusters, OUTPUT_data, irmv, iadd, which='both'):
     # Select a cluster isomer to add based on the boltzman probability and back calculate the energy from the probability
     if ( which == 'add' or which == 'both' ): 
         P_add_norm = [icount / sum(P_add) for icount in P_add]
-        clust_idx_add = np.random.choice(np.arange(len(P_add_norm)), 1, p=P_add_norm, replace=False)[0] 
-        Enew_add = E_add[cluster_dix_add]
-        Rnew_add = R_add[cluster_dix_add]
+        cluster_idx_add = np.random.choice(np.arange(len(P_add_norm)), 1, p=P_add_norm, replace=False)[0] 
+        Enew_add = E_add[cluster_idx_add]
+        Rnew_add = R_add[cluster_idx_add]
 
     # Select a cluster isomer to remove based on the boltzman probability and back calculate the energy from the probability
     if ( which == 'remove' or which == 'both' ): 
         P_rmv_norm = [icount / sum(P_rmv) for icount in P_rmv]
-        clust_idx_rmv = np.random.choice(np.arange(len(P_rmv_norm)), 1, p=P_rmv_norm, replace=False)[0]
-        Enew_rmv = E_rmv[cluster_dix_rmv]
-        Rnew_rmv = R_rmv[cluster_dix_rmv]
+        cluster_idx_rmv = np.random.choice(np.arange(len(P_rmv_norm)), 1, p=P_rmv_norm, replace=False)[0]
+        Enew_rmv = E_rmv[cluster_idx_rmv]
+        Rnew_rmv = R_rmv[cluster_idx_rmv]
+
+    cf_end = timeit.default_timer()
+
+    print(cf_end - cf_start)
 
     # Return new energy and radius
     if (which == 'both'):
