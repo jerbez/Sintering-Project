@@ -297,7 +297,6 @@ def PES_finder(X_new, Y_new, PES_copy, N_mesh):
 # Function that searches for cluster energies and radii from the DATA file. The inputs are the index of a specific cluster and
 # whether a monomer is to be added or removed from that cluster.
 def Cluster_finder(Clusters, OUTPUT_data, irmv, iadd, which='both'):
-    cf_start = timeit.default_timer()
     P_add = []
     P_rmv = []
     E_add = []
@@ -330,10 +329,6 @@ def Cluster_finder(Clusters, OUTPUT_data, irmv, iadd, which='both'):
         cluster_idx_rmv = np.random.choice(np.arange(len(P_rmv_norm)), 1, p=P_rmv_norm, replace=False)[0]
         Enew_rmv = E_rmv[cluster_idx_rmv]
         Rnew_rmv = R_rmv[cluster_idx_rmv]
-
-    cf_end = timeit.default_timer()
-
-    print(cf_end - cf_start)
 
     # Return new energy and radius
     if (which == 'both'):
@@ -554,10 +549,10 @@ with open('metropolis','w') as f4:
 
         # Write current cluster configuration to metropolis
         if ( (step % write_step) == 0 ): 
-            f4.write('%5s  %10i %16s %3i \n' % ('step =',step,'numclusters =',Ncluster))
-            f4.write('%4s  %14s  %14s  %14s  %14s\n' %  ('Pt', 'R', 'X','Y','E'))
+            f4.write('%5s  %10i %16s %3i %16s %3i \n' % ('step =',step,'# clusters =',Ncluster,'# atoms',totalAtoms))
+            f4.write('%4s  %4s  %14s  %14s  %14s  %14s\n' %  ('Ind', 'Pt', 'R', 'X','Y','E'))
             for i in range(Ncluster):
-                f4.write('%3i  %16.8f  %16.8f  %16.8f  %16.8f\n' % (OUTPUT_data[i][0], OUTPUT_data[i][1], OUTPUT_data[i][2], OUTPUT_data[i][3], OUTPUT_data[i][4]))
+                f4.write('%3i  %3i  %16.8f  %16.8f  %16.8f  %16.8f\n' % (i, OUTPUT_data[i][0], OUTPUT_data[i][1], OUTPUT_data[i][2], OUTPUT_data[i][3], OUTPUT_data[i][4]))
             f4.write('\n')
         
         # Choose a cluster to sinter
@@ -568,13 +563,16 @@ with open('metropolis','w') as f4:
         Y_temp        = OUTPUT_data[indx][3]
         E_temp        = OUTPUT_data[indx][4]
         
-        # Choose step size  
-        if ( num_atm_temp == 1 ): #For monomer case.  
+        # Step size for monomer case
+        if ( num_atm_temp == 1 ): 
             px = int( 4.0*(2.0*np.random.rand() - 1.0) )   # -4 < px < 4   
             py = int( 4.0*(2.0*np.random.rand() - 1.0) )   # -4 < py < 4   
-        else:  #If part of cluster we want bigger step, otherwise never breaks. We ensure that 
+        
+        #If part of cluster we want bigger step, otherwise never breaks. We ensure that
+        else:
             px = math.ceil( ( 2.0*R_temp)  * ( 2.0*np.random.rand() - 1.0 ) ) # the step-size is cluster size dependent
             py = math.ceil( ( 2.0*R_temp)  * ( 2.0*np.random.rand() - 1.0 ) ) 
+        
         X_new = X_temp + px * param.xstep_max
         Y_new = Y_temp + py * param.ystep_max
         
@@ -594,50 +592,64 @@ with open('metropolis','w') as f4:
         # Check if the moved monomer has landed in a existing cluster 
         inside_cluster = False
         for i in range (Ncluster):
-            # if it is inside a cluster. the cluster can be just one atom
+
+            # Check that the distance between the monomer and cluster i is no less than Ratom + R_i
             temp_dist = distance(X_new, Y_new, OUTPUT_data[i][2], OUTPUT_data[i][3])
             temp_r    = OUTPUT_data[i][1] + param.Ratom
-            if ( (temp_dist <  temp_r) and (i != indx) ):# i != indx means that it cannot be itself.   
-                Eold = E_temp + OUTPUT_data[i][4]       # total Eold
+            if ((temp_dist <  temp_r) and (i != indx)): 
                 
-                if ( OUTPUT_data[indx][0] == 1):# to check whether it is an atom or not
+                # Eold is the combined energies of the clusters BEFORE transfering a monomer
+                Eold = E_temp + OUTPUT_data[i][4]
+               
+                # Calculate new energy and radii of cluster i. If cluster indx is a monomer, Enew_rmv = 0 because it will be absorbed by cluster i
+                if (OUTPUT_data[indx][0] == 1):# to check whether it is an atom or not
                     Enew_rmv = 0.0
                     Enew_add, Rnew_add = Cluster_finder(Clusters, OUTPUT_data, i, i, 'add')
                
-                elif ( OUTPUT_data[indx][0] == 2):# ??? why the case of two atoms is special?
-                    # CLUSTER FINDER FOR EADD
+                # For the dimer, Ermv and Rrmv will be for a single atom, so the PES is needed
+                elif (OUTPUT_data[indx][0] == 2):
                     Enew_add, Rnew_add = Cluster_finder(Clusters, OUTPUT_data, i, i, 'add')
                     Enew_rmv = PES_finder(X_new, Y_new, PES_copy, N_mesh)
                     Rnew_rmv = param.Ratom
-                # choose a new cluster
 
+                # Calculate new energy and radii of cluster i and indx after the monomer transfer
                 else:
                     Enew_add, Enew_rmv, Rnew_add, Rnew_rmv = Cluster_finder(Clusters, OUTPUT_data, indx, i, 'both')
+                
+                # Enew is the combined energies of the clusters AFTER transfering a monomer
                 Enew = Enew_add + Enew_rmv
 
-                # Apply Metropolis condition here
+                # Apply Metropolis condition here. If satisfied, update current data
                 cond1 = (Enew-Eold < 0.0 and E_temp != OUTPUT_data[i][4])
-                cond2 = (E_temp == OUTPUT_data[i][4] and np.exp( -beta*abs(Enew-Eold)) / (np.pi*OUTPUT_data[i][0]**2)  > np.random.rand())
+                cond2 = (E_temp == OUTPUT_data[i][4] and np.exp( -beta*abs(Enew-Eold)) / (np.pi*OUTPUT_data[i][0]**2)  > np.random.rand()) # No clue what this is - Jake
                 cond3 = (E_temp != OUTPUT_data[i][4] and np.exp( -beta*(Enew-Eold) ) > np.random.rand())
-                
+               
                 if cond1 or cond2 or cond3: 
-                # modify old clusters 
-                    OUTPUT_data[i][0] = OUTPUT_data[i][0] + 1     # Natom
-                    OUTPUT_data[i][1] = Rnew_add                     # R
-                    OUTPUT_data[i][4] = Enew_add                     # E
-                    if ( OUTPUT_data[indx][0] == 1 ):        #Natom = 1
-                        # DELETE A CLUSTER (single atom)
+                    # Update cluster i (which has gained the monomer) with new atomic number, radius and energy
+                    OUTPUT_data[i][0] = OUTPUT_data[i][0] + 1
+                    OUTPUT_data[i][1] = Rnew_add
+                    OUTPUT_data[i][4] = Enew_add
+
+                    # If cluster indx (the sintering cluster) is a monomer, delete it because it was absorbed into cluster i
+                    if ( OUTPUT_data[indx][0] == 1 ):
                         del (OUTPUT_data[indx])
                         Ncluster -= 1
+                    
+                    # If cluster indx (the sintering cluster) is not a monomer, update the atomic number, radius and energy
                     else:
-                        OUTPUT_data[indx][0] = OUTPUT_data[indx][0] - 1     # Natom
-                        OUTPUT_data[indx][1] = Rnew_rmv                        # R
-                        OUTPUT_data[indx][4] = Enew_rmv                        # E
+                        OUTPUT_data[indx][0] = OUTPUT_data[indx][0] - 1
+                        OUTPUT_data[indx][1] = Rnew_rmv
+                        OUTPUT_data[indx][4] = Enew_rmv
+
+                    # Record the move to LOG
+                    with open('LOG', 'a') as f5:
+                        f5.write('%s \n' %  ('**********MOVE**********'))
+                        f5.write('%s \n' %  (f'MONOMER TRANSFER FROM CLUSTER {indx} to {i} ACCEPTED!'))
 
                 else:
                     with open('LOG', 'a') as f5:
                         f5.write('%s \n' %  ('**********MOVE**********'))
-                        f5.write('%s \n' %  ('METROPOLIS MOVE TO A NEW CLUSTER IS NOT FAVORABLE!'))
+                        f5.write('%s \n' %  (f'MONOMER TRANSFER FROM CLUSTER {indx} to {i} REJECTED!'))
                 inside_cluster = True
                 break  
  
